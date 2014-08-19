@@ -1,0 +1,24 @@
+{
+  "name": "app",
+  "version": "0.0.0",
+  "description": "Application to make the searching for location specifc jobs easier",
+  "main": "mainjobs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+     "grunt" : "~0.4.5",
+      "load-grunt-tasks": "~0.6.0",
+      "grunt-contrib-jshint": "~0.10.0",
+      "grunt-contrib-uglify": "~0.5.0",
+      "time-grunt": "~0.4.0",
+      "grunt-contrib-concat": "~0.5.0",
+      "grunt-contrib-watch": "~0.6.1"
+  },
+  "keywords": [
+    "jobs",
+    "business"
+  ],
+  "author": "Vijay Malhotra",
+  "license": "ISC"
+}

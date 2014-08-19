@@ -1,0 +1,32 @@
+{
+  "name": "viralmint-main-new",
+  "version": "0.1.0",
+  "authors": [
+    "Vijay Malhotra <vijay@offermedia.in>"
+  ],
+  "description": "Viralmint javascript library change to support CORS",
+  "main": "src/js/viralmint-main-new.js",
+  "moduleType": [
+    "amd",
+    "node"
+  ],
+  "keywords": [
+    "javscript",
+    "amd"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "bootstrap": "~3.2.0",
+    "jquery" : "~2.1.1"
+    "backbone" : "~1.1.2",
+    "mustache.js" : "~0.8.2"
+  }
+}
