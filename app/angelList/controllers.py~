@@ -1,0 +1,18 @@
+#from app import s_app
+#from angelList.models import AngelListModel
+
+
+print "executes"
+
+from flask import Blueprint, request, g, make_response, current_app
+
+angelListregister = Blueprint('angelList', __name__)
+
+@angelListregister.route('/m', methods=['GET'])
+def AngelListHandler():
+    ag = AngelListModel()
+    ag.client_id = s_app.config['CLIENT_ID']
+    print ag.client_id
+    #s_app.logger.info('got the client id %s' % ag.client_id)
+
+newman = "trut"

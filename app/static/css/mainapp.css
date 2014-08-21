@@ -1,0 +1,12 @@
+.navbar-inverse{
+    background-color: #d3505a;
+    border-color: #d3505a;
+    border-radius: 0;
+}
+
+.btn-angel{
+    background-color: #000;
+    border-color: #000;
+    color: #fff;
+    border-radius: 0;
+}
