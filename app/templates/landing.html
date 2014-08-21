@@ -1,34 +1,58 @@
 <html>
 
 <head>
-	<title> Login Page </title>
-	<link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.css" rel="stylesheet" />
+    <title>Login Page</title>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.css" rel="stylesheet" />
     <link href="{{ url_for('static', filename='css/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ url_for('static', filename='css/mainapp.css') }}" rel="stylesheet" />
 </head>
 
 <body>
 
-	<div class="container-fluid"> 
-		<div class="row">
-				<nav class="navbar navbar-inverse" role="navigation">
-	  
-				</nav>
-		</div>
-		<div class="container">
-		
-			<div class="row" style="margin-top: 15%;" >
-				<div class="col-md-4"></div>
-				<div class="col-md-4">
-					<div class="form-layer">
-						Authenticate yourself to the awesome !
-				<button class="btn btn-angel">Connect to Angel List</button>
-						
-					</div>
-				</div>
-				<div class="col-md-4"></div>		
-			</div>	
-		</div>
-	</div>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="navbar navbar-inverse" role="navigation">
+                <div><span class="nav-data">AngelList Demo App</span></div>
+            </nav>
+        </div>
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-9">
+                    <h3> Authenticate yourself to the awesome  !</h3>
+                    
+                </div>
+            </div>
+            <div class="row"><hr></div>
+            <div class="row" style="margin-top: 10%;">
+
+                <div class="col-md-3"></div>
+                <div class="col-md-5">
+                    <div class="form-layer">
+                        <a href="/connect">
+                            <button class="btn btn-angel">Connect to Angel List</button>
+                        </a>
+
+                    </div>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+            <div class="row"><br><br></div>
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-4">
+                    <div>
+                        <h4>{{error}}</h4>
+                    </div>
+                    <div>
+                        <h4>{{error_desc}}</h4>
+                    </div>
+                </div>
+                <div class="col-md-5"></div>
+            </div>
+        </div>
+    </div>
 </body>
+
 </html>

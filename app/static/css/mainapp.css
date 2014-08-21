@@ -1,12 +1,28 @@
+body{
+   font-family: Open-Sans; 
+}
+
 .navbar-inverse{
     background-color: #d3505a;
     border-color: #d3505a;
     border-radius: 0;
+    
 }
 
+.nav-data{
+    padding: 12px;
+    font-size: 20px;
+    font-weight: 700;
+}
 .btn-angel{
     background-color: #000;
     border-color: #000;
     color: #fff;
     border-radius: 0;
+    width: 400px;
+    height: 40px;
+    font-size: 18px;
+}
+.btn-angel:hover{
+    color: #fff;
 }
