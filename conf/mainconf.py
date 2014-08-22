@@ -12,9 +12,15 @@ class DevelopmentConfig(Config):
     CLIENT_SECRET =	'3f3866fbaaa73c59e4f026279dcd0005'
 
     """MySql configurations"""
+    """
     DB_HOST	= 'localhost'
     DB_PORT	= '3306'
     DB_USER	= 'root'
     DB_PASSWORD	= 'vijay02'
     DB_NAME = 'angelapp'
-    
+    """
+
+    """
+    Started using psycopg2 for postgres db
+    """
+    #SQLALCHEMY_DATABASE_URI = "postgresql://vijay:vijay02@localhost/deep"    

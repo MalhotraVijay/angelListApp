@@ -1,13 +1,14 @@
-import app
+from app import s_app
 import json
-from models import AngelListModel
+from models import AngelListModel, DbConnection
 from flask import render_template,redirect,session
-
+import app
 
 
 from flask import Blueprint, request, g, make_response, current_app
 
 angelListregister = Blueprint('angelList', __name__)
+
 
 
 @angelListregister.route('/connect', methods=['GET'])
@@ -52,16 +53,27 @@ def AuthenticationHandler():
 
         angelUser = ag.getMe()
 
-        conn = g.db
+        db = DbConnection()
+
+        conn = db.conn
+
+        print conn
+        
         x = conn.cursor()
 
         cursor = x.execute("""
         select * from userTokens where access_token = '%s'
         """ % access_token)
 
+        conn.commit()
+
+        rows = x.fetchall()
+
         session['userToken'] = access_token
-        
-        if cursor != 0:
+        print rows
+
+
+        if rows != []:
             app.logger.info('Returning User exists in db !')
         else:
             # Make the entry for the user and save the tokens
@@ -77,7 +89,8 @@ def AuthenticationHandler():
                 conn.commit()
             except:
                 conn.rollback()
-                
+
+        conn.close()
         app.logger.info('Authenticated the user')
         return redirect('/jobs')
     else:
@@ -97,17 +110,21 @@ def jobsHandler():
     Make an angular algorithm to make search easier and intutive
     let everyone be benifited by the app    '''
 
-    conn = g.db
+    db = DbConnection()
+    conn = db.conn
+    
     x = conn.cursor()
     try:
         cursor = x.execute("""
         select * from jobs
         """)
+        conn.commit()
     except:
         app.logger.info('Error in accessing the DB connection')
     
     allJobs =  x.fetchall()
-    
+
+    print allJobs
     
     return render_template('jobs.html',allJobs = allJobs)
     

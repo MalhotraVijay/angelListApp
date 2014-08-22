@@ -1,12 +1,13 @@
 """The AngleList model to store the application information """
 
 
-import app
+import app, psycopg2
 import json
 import hashlib
 import urllib, urllib2
 from werkzeug.urls import *
 from flask import g
+
 
 
 class AngelListModel():
@@ -110,27 +111,11 @@ class AngelListModel():
 
 
     def storeAllJobsInDB(self):
-    
-        conn = g.db
-        x = conn.cursor()
-        
-        '''for i in range(1,10):
-            allJobs = self.getJobs(i)
-            
-        
-            try:
-                print "inside try "
-                a = x.execute("""
-                INSERT INTO jobs
-                VALUES (%s,%s)""",(str(i),json.dumps(allJobs)))
-                print a
-                conn.commit()
-            except:
-                print "hereererere"
-                conn.rollback()
 
-            print "outisde try"
-        '''
+        db = DbConnection()
+        conn = db.conn
+        
+        x = conn.cursor()
 
         allJobs = self.getJobs(1)
 
@@ -141,13 +126,26 @@ class AngelListModel():
             a = x.execute("""
             INSERT INTO jobs
             VALUES (%s,%s)""",(str(1),json.dumps(allJobs)))
-            print a
             conn.commit()
         except:
-            print "hereererere"
+            app.logger.info('Exception Occured !')
             conn.rollback()
 
-        print "outisde try"
+        app.logger.info("Completed fetching all the jobs")
 
 
 
+class DbConnection():
+
+    def __init__(self):
+        conn = psycopg2.connect(
+            database="deep",
+            user="vijay",
+            password="vijay02",
+            host="localhost",
+            port="5432")
+        self.conn = conn
+
+
+    def closeConnection(self):
+        self.conn.close()

@@ -1,10 +1,11 @@
 from flask import Flask
 import os
 
-from angelList.controllers import angelListregister
 from werkzeug.contrib.fixers import ProxyFix
+from flask.ext.sqlalchemy import SQLAlchemy
 
-import app
+from sqlalchemy import create_engine
+
 import MySQLdb
 from flask import g
 
@@ -33,22 +34,22 @@ logger.setLevel('DEBUG')
 
 
 
-""" Regsitering the blueprints for all the other controllers """
-s_app.register_blueprint(angelListregister)
-
 
 """ Serve via Gunicorn """
 s_app.wsgi_app = ProxyFix(s_app.wsgi_app)
 
 
-
+"""
+db = SQLAlchemy(s_app)
+print db
+"""
 
 """Set the app secret to use sessions """
 s_app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 
 """ Initiating the database """
-
+"""
 @s_app.before_request
 def db_connect():
     g.db = MySQLdb.connect(host=s_app.config['DB_HOST'],
@@ -61,3 +62,5 @@ def db_connect():
 @s_app.teardown_request
 def db_disconnect(exception=None):
     g.db.close()
+
+"""
