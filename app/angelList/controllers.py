@@ -97,6 +97,23 @@ def jobsHandler():
     Make an angular algorithm to make search easier and intutive
     let everyone be benifited by the app    '''
 
+    conn = g.db
+    x = conn.cursor()
+    try:
+        cursor = x.execute("""
+        select * from jobs
+        """)
+    except:
+        app.logger.info('Error in accessing the DB connection')
     
-    return render_template('jobs.html')
+    allJobs =  x.fetchall()
     
+    
+    return render_template('jobs.html',allJobs = allJobs)
+    
+@angelListregister.route('/fetchJobs',methods=['GET'])
+def fetchJobsHandler():
+
+    ag = AngelListModel()
+    ag.storeAllJobsInDB()
+    return "success"

@@ -114,7 +114,7 @@ class AngelListModel():
         conn = g.db
         x = conn.cursor()
         
-        for i in range(1,10):
+        '''for i in range(1,10):
             allJobs = self.getJobs(i)
             
         
@@ -130,6 +130,24 @@ class AngelListModel():
                 conn.rollback()
 
             print "outisde try"
+        '''
+
+        allJobs = self.getJobs(1)
+
+        print str(allJobs)
+        
+        try:
+            print "inside try "
+            a = x.execute("""
+            INSERT INTO jobs
+            VALUES (%s,%s)""",(str(1),json.dumps(allJobs)))
+            print a
+            conn.commit()
+        except:
+            print "hereererere"
+            conn.rollback()
+
+        print "outisde try"
 
 
 

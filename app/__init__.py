@@ -2,6 +2,8 @@ from flask import Flask
 import os
 
 from angelList.controllers import angelListregister
+from werkzeug.contrib.fixers import ProxyFix
+
 import app
 import MySQLdb
 from flask import g
@@ -33,6 +35,12 @@ logger.setLevel('DEBUG')
 
 """ Regsitering the blueprints for all the other controllers """
 s_app.register_blueprint(angelListregister)
+
+
+""" Serve via Gunicorn """
+s_app.wsgi_app = ProxyFix(s_app.wsgi_app)
+
+
 
 
 """Set the app secret to use sessions """
