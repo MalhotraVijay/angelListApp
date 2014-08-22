@@ -7,6 +7,7 @@ import hashlib
 import urllib, urllib2
 from werkzeug.urls import *
 from flask import g
+from app import s_app
 
 
 
@@ -139,11 +140,11 @@ class DbConnection():
 
     def __init__(self):
         conn = psycopg2.connect(
-            database="deep",
-            user="vijay",
-            password="vijay02",
-            host="localhost",
-            port="5432")
+            database=s_app.config['DB_NAME'],
+            user = s_app.config['DB_USER'],
+            password=s_app.config['DB_PASSWORD'],
+            host=s_app.config['DB_HOST'],
+            port=s_app.config['DB_PORT'])
         self.conn = conn
 
 
