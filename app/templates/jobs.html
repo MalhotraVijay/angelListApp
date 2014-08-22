@@ -14,6 +14,14 @@
         locationArr = [];
         locationDict = [];
         jobDetailsDict = {};
+        jobTypeDict = {};
+        jobRoleDict = {
+            'marketing':[],
+            'product':[],
+            'developer,software,engineer':[],
+            'sales':[],
+            'fincance,accounting':[],
+            };
     </script>
 </head>
 
@@ -74,8 +82,8 @@
                         </div>
                         <div class="searchFilters" style="margin-top:20px;">
                             <span class="filterName" showDiv="locationsFilter">Location ▾</span>
-                            <span class="filterName">Role ▾</span>
-                            <span class="filterName">Job Type ▾</span>
+                            <span class="filterName" showDiv="jobsTypeFilter">Job Type ▾</span>
+                            <span class="filterName" showDiv="roleTypeFilter">Role ▾</span>
                             <span class="filterName">Keywords ▾</span>
 
                         </div>
@@ -108,6 +116,37 @@
                             </ul>
                         </div>
                     </div>
+
+                </div>
+                <div class="col-md-2">
+                    <div class="filterHoverDiv" id="jobsTypeFilter" style="display:none; position:absolute; z-index:10">
+                        <div><a href="#" class="jobTypeAnchor" jobType="full-time">Fulltime</a>
+                        </div>
+                        <div><a href="#" class="jobTypeAnchor" jobType="contract">Contract</a>
+                        </div>
+                        <div><a href="#" class="jobTypeAnchor" jobType="internship">Internship</a>
+                        </div>
+                        <div><a href="#" class="jobTypeAnchor" jobType="cofounder">Co-Founder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="filterHoverDiv" id="roleTypeFilter" style="display:none; position:absolute; z-index:10">
+                        <div><a href="#" class="roleTypeAnchor" roleType="Software,Engineer,developer">Software Engineer</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="Mobile,developer">Mobile Developer</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="Marketing,">Marketing</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="Product,Manager">Product Manager</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="Sales,">Sales</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="Finance,accounting">Finance/Accounting</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="Operations,">Operations</a>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -118,15 +157,15 @@
                 <ul class="pagination pull-right">
                     <li><a href="#">&laquo;</a>
                     </li>
-                    <li><a href="#">1</a>
+                    <li><a href="#" onclick=" displayAllJobsByPage(1);">1</a>
                     </li>
-                    <li><a href="#">2</a>
+                    <li><a href="#" onclick=" displayAllJobsByPage(2);">2</a>
                     </li>
-                    <li><a href="#">3</a>
+                    <li><a href="#" onclick=" displayAllJobsByPage(3);">3</a>
                     </li>
-                    <li><a href="#">4</a>
+                    <li><a href="#" onclick=" displayAllJobsByPage(4);">4</a>
                     </li>
-                    <li><a href="#">5</a>
+                    <li><a href="#" onclick=" displayAllJobsByPage(5);">5</a>
                     </li>
                     <li><a href="#">&raquo;</a>
                     </li>
@@ -139,7 +178,7 @@
                     <div class="mainFilter">
                         <div id="vertical-tabs-view" class="site-navigation">
                             <ul class="nav nav-pills nav-stacked">
-                                <li class="active"><a href="#">All Jobs</a>
+                                <li class="active"><a href="#" onclick="displayAllJobsByPage(1);">All Jobs</a>
                                 </li>
                                 <li class=""><a href="#">Interested In you </a>
                                 </li>
@@ -184,22 +223,48 @@
                 return;
             });
 
-
-
-            $(".filterName").hover(function () {
-                    $(".filterHoverDiv").fadeOut();
-                    $('#' + $(this).attr("showDiv")).fadeIn();
-                },
-                function () {
-                    //$(".filterHoverDiv").fadeOut();
-                });
-
-
             
             
+            
+            $(".filterName").click(function () {
+                //$(".filterHoverDiv").hide();
+                $('#' + $(this).attr("showDiv")).toggle();
+            });
+
+//            $(".filterName").hover(function () {
+//                    $(".filterHoverDiv").fadeOut();
+//                    $('#' + $(this).attr("showDiv")).fadeIn();
+//                },
+//                function () {
+//                    //$(".filterHoverDiv").fadeOut();
+//                });
+//
+//            $(".filterHoverDiv").hover(function () {},
+//                function () {
+//                    $(".filterHoverDiv").fadeOut();
+//                });
+
+
+            //Trigger logic for the Job type
+
+            $(".jobTypeAnchor").click(function () {
+                console.log($(this).attr('jobType'));
+                buildCurrentFilters($(this).attr('jobType'), 'jobTypeTag');
+                refreshJobs();
+            });
+
+            
+            //Trigger logic for the job role
+            
+            $(".roleTypeAnchor").click(function () {
+                console.log($(this).attr('roleType'));
+                buildCurrentFilters($(this).attr('roleType'), 'roleTypeTag');
+                //refreshJobs();
+            });
 
 
 
+            //Trigger logic For the location based searching
 
             $("#contentSearch").autocomplete({
                 source: locationArr,
@@ -209,23 +274,16 @@
 
                 if (e.which == 13) {
 
-                    var template = '<span class="singleFilter"> <span class="filternm">' + $(this).val() + '</span><span ><a href="javascript:void(0);" onclick="removeFilter(this)" class="removeFilter">&nbsp;X</a></span> </span>';
-                    $(".currentFilters").append(template);
-
-                    //empty the current html
-                    $('#allJobsDetail').html("");
-
-                    $(".singleFilter").each(function (index, el) {
-                        displayAllJobsByLocation(el.children[0].innerHTML);
-                    });
+                    buildCurrentFilters($(this).val(), 'locationTag');
+                    refreshJobs();
 
                 }
 
             });
-            
-            
+
+
             //app logic starts here
-            
+
             displayAllJobsByPage(1);
 
 
@@ -234,6 +292,10 @@
 
 
         var displayAllJobsByPage = function (pageid) {
+
+            //empty the current html
+            $('#allJobsDetail').html("");
+
             payloadJson = JSON.parse(jobsArr[pageid - 1].payload);
 
             payloadJson.jobs.forEach(function (jobObj, index) {
@@ -251,6 +313,26 @@
                     }
                 });
 
+
+
+                //Constructing the jobsType LookUp.
+                if (!jobTypeDict[jobObj.job_type] || jobTypeDict[jobObj.job_type] == 'undefined') {
+                    jobTypeDict[jobObj.job_type] = [];
+                } else {
+                    jobTypeDict[jobObj.job_type].push(jobObj.id);
+                }
+                
+                //Constructing the role lookup
+                
+                if(jobObj.title.toLowerCase().indexOf('market')){
+                    jobRoleDict['marketing'].push(jobObj.id);
+                }else if(jobObj.title.toLowerCase().indexOf('product')){
+                    jobRoleDict['product'].push(jobObj.id);
+                }else if(jobObj.title.toLowerCase().indexOf('software') || jobObj.title.toLowerCase().indexOf('develop') ){
+                    jobRoleDict['software'].push(jobObj.id);
+                }
+                
+
                 //console.log(index);
 
                 buildTemplate(jobObj, locationTag)
@@ -258,6 +340,9 @@
 
             });
         };
+        
+        
+        
 
         var displayAllJobsByLocation = function (location) {
             payloadJson = JSON.parse(jobsArr[0].payload);
@@ -275,38 +360,82 @@
             });
 
         };
+        
+        
+        var displayAllJobsByJobType = function (jobType) {
+            if(jobTypeDict[jobType] && jobTypeDict[jobType] !== 'undefined'){
+                jobTypeDict[jobType].forEach(function(jobId,index){
+                    displayAllJobsByJobId(jobId);
+                });
+            }
+        };
+        
 
         var displayAllJobsByJobId = function (jobId, location) {
 
             console.log(jobDetailsDict[jobId]);
             buildTemplate(jobDetailsDict[jobId], location);
-        }
+        };
 
 
 
         var buildTemplate = function (jobObj, locationTag) {
 
             var template = '<div class="singleJob-row card">' +
+                '<div class="companyImage col-md-1"><img src="' + jobObj.startup.thumb_url + '" width="37" height="37" ></img></div>' +
                 '<div class="jobTitle col-md-3">' + jobObj.title + '</div>' +
                 '<div class="jobStartupName col-md-2">' + jobObj.startup.name + '</div>' +
                 '<div class="jobDate col-md-2"> ' + jobObj.created_at + '</div>' +
-                '<div class="jobUrl col-md-3"> ' + jobObj.angellist_url + '</div>' +
+                '<div class="jobUrl col-md-2"> <a href="' + jobObj.angellist_url + '"> Visit Job ! </a></div>' +
                 '<div class="jobLocation col-md-2"> ' + locationTag + '</div>' +
                 '<div class="else">' + '.' + '</div>' +
                 '</div>'
-            $('#allJobsDetail').append(template);
+            $('#allJobsDetail').prepend(template);
+        };
+
+
+        var buildCurrentFilters = function (filterName, filterTag) {
+
+            var template = '<span class="singleFilter"> <span class="filternm" filterTag="' + filterTag + '" >' + filterName + '</span><span ><a href="javascript:void(0);" onclick="removeFilter(this)" class="removeFilter">&nbsp;X</a></span> </span>';
+            $(".currentFilters").append(template);
+
+
+
+
+        };
+
+        var refreshJobs = function () {
+            //empty the current html
+            $('#allJobsDetail').html("");
+            
+            if($(".singleFilter").length == 0){
+                displayAllJobsByPage(1);
+            }
+            
+            $(".singleFilter").each(function (index, el) {
+                
+                
+                if(el.children[0].getAttribute('filterTag') == 'locationTag'){
+                    displayAllJobsByLocation(el.children[0].innerHTML);    
+                }
+                
+                console.log(el.children[0]);
+                
+                if(el.children[0].getAttribute('filterTag') == 'jobTypeTag'){
+                    displayAllJobsByJobType(el.children[0].innerHTML);    
+                }
+                
+            });
+
         };
 
 
         var removeFilter = function (ev) {
             ev.parentElement.parentElement.parentElement.removeChild(ev.parentElement.parentElement);
 
-            //empty the current html
-            $('#allJobsDetail').html("");
+            refreshJobs();
 
-            $(".singleFilter").each(function (index, el) {
-                displayAllJobsByLocation(el.children[0].innerHTML);
-            });
+            
         };
     </script>
 

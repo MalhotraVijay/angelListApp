@@ -53,6 +53,7 @@ body{
 .searchFilters span{
     padding: 10px;
     background-color: #f7f7f7;
+    margin-left: 8%;
 }
 
 .searchFilters span:hover{
@@ -60,11 +61,51 @@ body{
     color: #fff;
 }
 
+.filterName{
+    cursor: pointer;
+}
+
 #locationsFilter{
     background-color: #000;
     padding: 10px 10px 10px 10px;
     opacity: 0.9;
     color: #FFF;
+}
+
+#jobsTypeFilter{
+    background-color: #000;
+    padding: 10px 10px 10px 10px;
+    opacity: 0.9;
+    color: #FFF;
+}
+
+#jobsTypeFilter > div{
+    background-color: #FFF;
+    padding: 7px;
+}
+
+#jobsTypeFilter > div > a{
+    text-decoration: none;
+    width: 100%;
+    color: #000;
+}
+
+#roleTypeFilter{
+    background-color: #000;
+    padding: 10px 10px 10px 10px;
+    opacity: 0.9;
+    color: #FFF;
+}
+
+#roleTypeFilter > div{
+    background-color: #FFF;
+    padding: 7px;
+}
+
+#roleTypeFilter > div > a{
+    text-decoration: none;
+    width: 100%;
+    color: #000;
 }
 
 
