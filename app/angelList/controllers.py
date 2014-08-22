@@ -113,7 +113,7 @@ def jobsHandler():
     
 @angelListregister.route('/fetchJobs',methods=['GET'])
 def fetchJobsHandler():
-
+    '''For the job handler'''
     ag = AngelListModel()
     ag.storeAllJobsInDB()
     return "success"
