@@ -102,7 +102,7 @@ def AuthenticationHandler():
 @angelListregister.route('/jobs',methods=['GET'])
 def jobsHandler():
 
-    print session['userToken']
+    access_token = session['userToken']
 
     '''
     Get user from the db
@@ -110,10 +110,25 @@ def jobsHandler():
     Make an angular algorithm to make search easier and intutive
     let everyone be benifited by the app    '''
 
+    
+
+    
     db = DbConnection()
     conn = db.conn
     
     x = conn.cursor()
+
+    try:
+        cursor = x.execute("""
+        select * from userTokens where access_token = '%s'
+        """ % access_token)
+        conn.commit()
+    except:
+        app.logger.info('Error in accessing the DB connection')
+    
+    currentUser =  x.fetchone() or {}
+    
+    
     try:
         cursor = x.execute("""
         select * from jobs
@@ -126,8 +141,12 @@ def jobsHandler():
 
     #print allJobs
     
-    return render_template('jobs.html',allJobs = allJobs)
-    
+    return render_template(
+        'jobs.html',
+        allJobs = allJobs,
+        currentUser =currentUser)
+
+
 @angelListregister.route('/fetchJobs',methods=['GET'])
 def fetchJobsHandler():
     '''For the job handler'''

@@ -32,6 +32,7 @@
 
     <div class="container-fluid">
 
+
         <div class="row">
             <nav class="navbar navbar-inverse" role="navigation">
                 <div><span class="nav-data">AngelList Demo App</span>
@@ -39,10 +40,23 @@
             </nav>
         </div>
         <div id="searchResults" class="row"></div>
+
         <div class="container">
 
             <div class="row" style="">
-                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <div id="currentUser" class="">
+                        <div id="userName" style="display:none;">{{currentUser.1}}</div>
+                        <div id="userJson" style="display:none;">{{currentUser.3}}</div>
+                        <div id="userInfo" style="padding-left:20px;">
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        userInfo = {};
+                        userInfo['name'] = '{{currentUser.1}}';
+                        userInfo['userJson'] = $('#userJson').html();
+                    </script>
+                </div>
                 <div class="col-md-4">
                     <div class="">
                         <h5> Search for jobs on relevant filters ! </h5>
@@ -109,9 +123,10 @@
                         <div class="suggestedLocation">
                             search and press enter
                             <ul type="none" id="topLinks">
-                                <li><a href=""></a>
+                                <li>
+                                    <a href=""></a>
                                 </li>
-                                
+
                             </ul>
                         </div>
                     </div>
@@ -133,7 +148,7 @@
                     <div class="filterHoverDiv" id="roleTypeFilter" style="display:none; position:absolute; z-index:10">
                         <div><a href="#" class="roleTypeAnchor" roleType="developer,software,engineer">Software Engineer</a>
                         </div>
-                        
+
                         <div><a href="#" class="roleTypeAnchor" roleType="marketing">Marketing</a>
                         </div>
                         <div><a href="#" class="roleTypeAnchor" roleType="product">Product Manager</a>
@@ -214,6 +229,15 @@
 
             });
 
+
+            //Fill the userInfo
+            var userInfoObj = JSON.parse(userInfo.userJson);
+            var userTemplate = '<div><img width="100" class="img-circle" height="100" src="' +
+                userInfoObj.image + '"/></div><div><span>' +
+                userInfoObj.name + ', ' + userInfoObj.locations[0].name + '</span></div><div><p style="width:250px;">' +
+                userInfoObj.bio + '</p></div></div>';
+
+            $("#userInfo").append(userTemplate);
 
 
 
@@ -300,27 +324,29 @@
                 var locationTag = '';
                 tags = jobObj.tags;
                 var dict = {};
-                
+
                 tags.forEach(function (tag, index) {
                     if (tag.tag_type == "LocationTag") {
                         locationTag = tag.name;
-                        
+
 
                         dict[tag.name] = jobObj.id;
                         dict[jobObj.id] = tag.name;
-                        
+
                         locationDict.push(dict);
-                        
-                        $.extend(jobObj,{'location' : tag.name});
-                        
+
+                        $.extend(jobObj, {
+                            'location': tag.name
+                        });
+
                         jobDetailsDict[jobObj.id] = jobObj;
-                        
+
                     }
                 });
 
                 if (!jobVisited) {
-                    
-                    
+
+
                     //Constructing the jobsLocation LookUp.
                     locationTagName = dict[jobObj.id];
                     if (!jobLocationDict[locationTagName] || jobLocationDict[locationTagName] == 'undefined') {
@@ -330,8 +356,8 @@
                     } else {
                         jobLocationDict[locationTagName].push(jobObj.id);
                     }
-                    
-                    
+
+
 
                     //Constructing the jobsType LookUp.
                     if (!jobTypeDict[jobObj.job_type] || jobTypeDict[jobObj.job_type] == 'undefined') {
@@ -358,7 +384,7 @@
                         jobRoleDict['others'].push(jobObj.id);
                     }
                 }
-                
+
 
 
                 //console.log(index);
@@ -367,7 +393,7 @@
 
 
             });
-            
+
             //visited for the one web app instance !
             jobsArr[pageid - 1].visited = true;
         };
@@ -376,7 +402,7 @@
 
 
         var displayAllJobsByLocation = function (location) {
-            
+
             if (jobLocationDict[location] && jobLocationDict[location] !== 'undefined') {
                 jobLocationDict[location].forEach(function (jobId, index) {
                     displayAllJobsByJobId(jobId);
@@ -393,10 +419,10 @@
                 });
             }
         };
-        
+
         var displayAllJobsByRoleType = function (roleType) {
             console.log(roleType);
-            if (jobRoleDict[roleType] && jobRoleDict[roleType] !== 'undefined'){
+            if (jobRoleDict[roleType] && jobRoleDict[roleType] !== 'undefined') {
                 jobRoleDict[roleType].forEach(function (jobId, index) {
                     displayAllJobsByJobId(jobId);
                 });
@@ -453,7 +479,7 @@
                 if (el.children[0].getAttribute('filterTag') == 'jobTypeTag') {
                     displayAllJobsByJobType(el.children[0].innerHTML);
                 }
-                
+
                 if (el.children[0].getAttribute('filterTag') == 'roleTypeTag') {
                     displayAllJobsByRoleType(el.children[0].innerHTML);
                 }
