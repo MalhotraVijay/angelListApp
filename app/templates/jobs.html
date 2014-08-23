@@ -14,6 +14,7 @@
         locationArr = [];
         locationDict = [];
         jobDetailsDict = {};
+        jobLocationDict = {};
         jobTypeDict = {};
         jobRoleDict = {
             'marketing': [],
@@ -98,7 +99,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-1"></div>
+                <div class="col-md-2"></div>
                 <div class="col-md-2">
                     <div class="filterHoverDiv" id="locationsFilter" style="display:none; position:absolute; z-index:10">
                         <div class="form-group">
@@ -106,15 +107,11 @@
                         </div>
 
                         <div class="suggestedLocation">
-                            Top Suggested Links
-                            <ul type="none">
-                                <li><a href="">India</a>
+                            search and press enter
+                            <ul type="none" id="topLinks">
+                                <li><a href=""></a>
                                 </li>
-                                <li><a href="">USA</a>
-                                </li>
-                                <li><a href="">Pune</a>
-                                </li>
-
+                                
                             </ul>
                         </div>
                     </div>
@@ -136,8 +133,7 @@
                     <div class="filterHoverDiv" id="roleTypeFilter" style="display:none; position:absolute; z-index:10">
                         <div><a href="#" class="roleTypeAnchor" roleType="developer,software,engineer">Software Engineer</a>
                         </div>
-                        <div><a href="#" class="roleTypeAnchor" roleType="mobile,developer">Mobile Developer</a>
-                        </div>
+                        
                         <div><a href="#" class="roleTypeAnchor" roleType="marketing">Marketing</a>
                         </div>
                         <div><a href="#" class="roleTypeAnchor" roleType="product">Product Manager</a>
@@ -275,7 +271,6 @@
                     refreshJobs();
 
                 }
-                e.preventDefault();
 
             });
 
@@ -304,13 +299,16 @@
 
                 var locationTag = '';
                 tags = jobObj.tags;
+                var dict = {};
+                
                 tags.forEach(function (tag, index) {
                     if (tag.tag_type == "LocationTag") {
                         locationTag = tag.name;
-                        locationArr.push(tag.name);
+                        
 
-                        var dict = {};
-                        dict[tag.name] = jobObj.id
+                        dict[tag.name] = jobObj.id;
+                        dict[jobObj.id] = tag.name;
+                        
                         locationDict.push(dict);
                         
                         $.extend(jobObj,{'location' : tag.name});
@@ -321,10 +319,24 @@
                 });
 
                 if (!jobVisited) {
+                    
+                    
+                    //Constructing the jobsLocation LookUp.
+                    locationTagName = dict[jobObj.id];
+                    if (!jobLocationDict[locationTagName] || jobLocationDict[locationTagName] == 'undefined') {
+                        jobLocationDict[locationTagName] = [];
+                        jobLocationDict[locationTagName].push(jobObj.id);
+                        locationArr.push(locationTagName);
+                    } else {
+                        jobLocationDict[locationTagName].push(jobObj.id);
+                    }
+                    
+                    
 
                     //Constructing the jobsType LookUp.
                     if (!jobTypeDict[jobObj.job_type] || jobTypeDict[jobObj.job_type] == 'undefined') {
                         jobTypeDict[jobObj.job_type] = [];
+                        jobTypeDict[jobObj.job_type].push(jobObj.id);
                     } else {
                         jobTypeDict[jobObj.job_type].push(jobObj.id);
                     }
@@ -346,6 +358,7 @@
                         jobRoleDict['others'].push(jobObj.id);
                     }
                 }
+                
 
 
                 //console.log(index);

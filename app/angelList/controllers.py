@@ -124,7 +124,7 @@ def jobsHandler():
     
     allJobs =  x.fetchall()
 
-    print allJobs
+    #print allJobs
     
     return render_template('jobs.html',allJobs = allJobs)
     

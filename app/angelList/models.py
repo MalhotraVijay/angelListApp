@@ -118,35 +118,23 @@ class AngelListModel():
         
         x = conn.cursor()
 
-        allJobs = self.getJobs(1)
 
-        #print str(allJobs)
+        for i in range(1,6):
+
+            allJobs = self.getJobs(i)
+
+            #print str(allJobs)
         
-        try:
-            app.logger.info('Trying to save JOb in the db')
-            a = x.execute("""
-            INSERT INTO jobs
-            VALUES (%s,%s)""",(str(1),json.dumps(allJobs)))
-            conn.commit()
-        except:
-            app.logger.info('Exception Occured !')
-            conn.rollback()
+            try:
+                app.logger.info('Trying to save JOb in the db')
+                a = x.execute("""
+                INSERT INTO jobs
+                VALUES (%s,%s)""",(str(i),json.dumps(allJobs)))
+                conn.commit()
+            except:
+                app.logger.info('Exception Occured !')
+                conn.rollback()
 
-        allJobs = self.getJobs(2)
-
-        #print str(allJobs)
-        
-        try:
-            app.logger.info('Trying to save JOb in the db')
-            a = x.execute("""
-            INSERT INTO jobs
-            VALUES (%s,%s)""",(str(2),json.dumps(allJobs)))
-            conn.commit()
-        except:
-            app.logger.info('Exception Occured !')
-            conn.rollback()
-
-        
         conn.close()
 
         app.logger.info("Completed fetching all the jobs")
