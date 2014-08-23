@@ -376,19 +376,12 @@
 
 
         var displayAllJobsByLocation = function (location) {
-            payloadJson = JSON.parse(jobsArr[0].payload);
-
-            var jobsToshow = [];
-
-            locationDict.forEach(function (dictObj, index) {
-                //console.log(dictObj[location]);
-
-                if (dictObj[location] && dictObj[location] !== 'undefined') {
-                    jobsToshow.push(dictObj[location]);
-                    displayAllJobsByJobId(dictObj[location], location);
-
-                }
-            });
+            
+            if (jobLocationDict[location] && jobLocationDict[location] !== 'undefined') {
+                jobLocationDict[location].forEach(function (jobId, index) {
+                    displayAllJobsByJobId(jobId);
+                });
+            }
 
         };
 
@@ -411,7 +404,7 @@
         };
 
 
-        var displayAllJobsByJobId = function (jobId, location) {
+        var displayAllJobsByJobId = function (jobId) {
 
             console.log(jobDetailsDict[jobId]);
             buildTemplate(jobDetailsDict[jobId], jobDetailsDict[jobId].location);
@@ -425,9 +418,9 @@
                 '<div class="companyImage col-md-1"><img src="' + jobObj.startup.thumb_url + '" width="37" height="37" ></img></div>' +
                 '<div class="jobTitle col-md-3">' + jobObj.title + '</div>' +
                 '<div class="jobStartupName col-md-2">' + jobObj.startup.name + '</div>' +
-                '<div class="jobDate col-md-2"> ' + jobObj.created_at + '</div>' +
+                '<div class="jobDate col-md-2"> ' + jobObj.job_type + '</div>' +
                 '<div class="jobUrl col-md-2"> <a href="' + jobObj.angellist_url + '"> Visit Job ! </a></div>' +
-                '<div class="jobLocation col-md-2"> ' + locationTag + '</div>' +
+                '<div class="jobLocation col-md-2"> <b> <u> ' + locationTag + '</u> </b></div>' +
                 '<div class="else">' + '.' + '</div>' +
                 '</div>'
             $('#allJobsDetail').prepend(template);
