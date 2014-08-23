@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Login Page</title>
+    <title>Jobs Page</title>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.css" rel="stylesheet" />
     <link href="{{ url_for('static', filename='css/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet" />
@@ -11,10 +11,13 @@
 
     <script type="text/javascript">
         jobsArr = [];
+        userInfo = 'undefined';
         locationArr = [];
+        companyArr = [];
         locationDict = [];
         jobDetailsDict = {};
         jobLocationDict = {};
+        jobCompanyDict = {};
         jobTypeDict = {};
         jobRoleDict = {
             'marketing': [],
@@ -40,22 +43,26 @@
             </nav>
         </div>
         <div id="searchResults" class="row"></div>
+        <div id="companysearchResults" class="row"></div>
 
         <div class="container">
 
             <div class="row" style="">
                 <div class="col-md-4">
+                    {% if currentUser %}
                     <div id="currentUser" class="">
+
                         <div id="userName" style="display:none;">{{currentUser.1}}</div>
                         <div id="userJson" style="display:none;">{{currentUser.3}}</div>
                         <div id="userInfo" style="padding-left:20px;">
                         </div>
                     </div>
                     <script type="text/javascript">
-                        userInfo = {};
+                        var userInfo = {};
                         userInfo['name'] = '{{currentUser.1}}';
                         userInfo['userJson'] = $('#userJson').html();
                     </script>
+                    {% endif %}
                 </div>
                 <div class="col-md-4">
                     <div class="">
@@ -101,7 +108,7 @@
                             <span class="filterName" showDiv="locationsFilter">Location ▾</span>
                             <span class="filterName" showDiv="jobsTypeFilter">Job Type ▾</span>
                             <span class="filterName" showDiv="roleTypeFilter">Role ▾</span>
-                            <span class="filterName">Keywords ▾</span>
+                            <span class="filterName" showDiv="companyFilter">Keywords ▾</span>
 
                         </div>
                     </div>
@@ -160,6 +167,23 @@
                         <div><a href="#" class="roleTypeAnchor" roleType="operations">Operations</a>
                         </div>
                         <div><a href="#" class="roleTypeAnchor" roleType="others">Others</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="filterHoverDiv" id="companyFilter" style="display:none; position:absolute; z-index:10">
+                        <div class="form-group">
+                            <input type="text" class="form-control ui-autocomplete-input" searchFor="" searchParam="" name="companycontentSearch" id="companycontentSearch" placeholder="Search">
+                        </div>
+
+                        <div class="companySuggested">
+                            Search Company and press enter
+                            <ul type="none" id="topLinks">
+                                <li>
+                                    <a href=""></a>
+                                </li>
+
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -231,14 +255,15 @@
 
 
             //Fill the userInfo
-            var userInfoObj = JSON.parse(userInfo.userJson);
-            var userTemplate = '<div><img width="100" class="img-circle" height="100" src="' +
-                userInfoObj.image + '"/></div><div><span>' +
-                userInfoObj.name + ', ' + userInfoObj.locations[0].name + '</span></div><div><p style="width:250px;">' +
-                userInfoObj.bio + '</p></div></div>';
+            if (userInfo && userInfo != 'undefined') {
+                var userInfoObj = JSON.parse(userInfo.userJson);
+                var userTemplate = '<div><img width="100" class="img-circle" height="100" src="' +
+                    userInfoObj.image + '"/></div><div><span>' +
+                    userInfoObj.name + ', ' + userInfoObj.locations[0].name + '</span></div><div><p style="width:250px;">' +
+                    userInfoObj.bio + '</p></div></div>';
 
-            $("#userInfo").append(userTemplate);
-
+                $("#userInfo").append(userTemplate);
+            }
 
 
             $(".filterName").click(function () {
@@ -287,23 +312,34 @@
                 source: locationArr,
                 appendTo: "#searchResults"
             });
+            
+            $("#companycontentSearch").autocomplete({
+                source: companyArr,
+                appendTo: "#companysearchResults"
+            });
+            
+            
             $("#contentSearch").keypress(function (e) {
-
                 if (e.which == 13) {
-
                     buildCurrentFilters($(this).val(), 'locationTag');
                     refreshJobs();
-
                 }
-
+            });
+            
+            $("#companycontentSearch").keypress(function (e) {
+                if (e.which == 13) {
+                    buildCurrentFilters($(this).val(), 'companyTag');
+                    refreshJobs();
+                }
             });
 
 
             //app logic starts here
 
             displayAllJobsByPage(1);
-
-
+            displayAllJobsByPage(2);
+            displayAllJobsByPage(3);
+            displayAllJobsByPage(1);
         });
 
 
@@ -317,9 +353,6 @@
             payloadJson = JSON.parse(jobsArr[pageid - 1].payload);
 
             payloadJson.jobs.forEach(function (jobObj, index) {
-
-
-
 
                 var locationTag = '';
                 tags = jobObj.tags;
@@ -352,12 +385,23 @@
                     if (!jobLocationDict[locationTagName] || jobLocationDict[locationTagName] == 'undefined') {
                         jobLocationDict[locationTagName] = [];
                         jobLocationDict[locationTagName].push(jobObj.id);
-                        locationArr.push(locationTagName);
+                        if(locationTagName && locationTagName != 'undefined')
+                            locationArr.push(locationTagName);
                     } else {
                         jobLocationDict[locationTagName].push(jobObj.id);
                     }
 
-
+                    
+                    //Constructing the jobsCompany LookUp.
+                    if (!jobCompanyDict[jobObj.startup.name] || jobCompanyDict[jobObj.startup.name] == 'undefined') {
+                        jobCompanyDict[jobObj.startup.name] = [];
+                        jobCompanyDict[jobObj.startup.name].push(jobObj.id);
+                        if(jobObj.startup.name && jobObj.startup.name != 'undefined')
+                            companyArr.push(jobObj.startup.name);
+                    } else {
+                        jobCompanyDict[jobObj.startup.name].push(jobObj.id);
+                    }
+                    
 
                     //Constructing the jobsType LookUp.
                     if (!jobTypeDict[jobObj.job_type] || jobTypeDict[jobObj.job_type] == 'undefined') {
@@ -428,6 +472,15 @@
                 });
             }
         };
+        
+        var displayAllJobsByCompany = function (company) {
+            console.log(company);
+            if (jobCompanyDict[company] && jobCompanyDict[company] !== 'undefined') {
+                jobCompanyDict[company].forEach(function (jobId, index) {
+                    displayAllJobsByJobId(jobId);
+                });
+            }
+        };
 
 
         var displayAllJobsByJobId = function (jobId) {
@@ -483,6 +536,10 @@
                 if (el.children[0].getAttribute('filterTag') == 'roleTypeTag') {
                     displayAllJobsByRoleType(el.children[0].innerHTML);
                 }
+                
+                if (el.children[0].getAttribute('filterTag') == 'companyTag') {
+                    displayAllJobsByCompany(el.children[0].innerHTML);
+                }
 
             });
 
@@ -493,7 +550,6 @@
             ev.parentElement.parentElement.parentElement.removeChild(ev.parentElement.parentElement);
 
             refreshJobs();
-
 
         };
     </script>

@@ -141,6 +141,49 @@ class AngelListModel():
 
 
 
+    def getUser(self,access_token):
+        db = DbConnection()
+        conn = db.conn
+    
+        x = conn.cursor()
+
+        try:
+            cursor = x.execute("""
+            select * from userTokens where access_token = '%s'
+            """ % access_token)
+            conn.commit()
+        except:
+            app.logger.info('Error in accessing the userToken DB connection')
+    
+        currentUser =  x.fetchone() or {}
+
+        conn.close()
+        
+        return currentUser
+
+    def getAllJobs(self):
+
+        db = DbConnection()
+        conn = db.conn
+    
+        x = conn.cursor()
+        try:
+            cursor = x.execute("""
+            select * from jobs
+            """)
+            conn.commit()
+        except:
+            app.logger.info('Error in accessing the Job DB connection')
+    
+        allJobs =  x.fetchall()
+
+        conn.close()
+        return allJobs
+
+
+        
+
+
 class DbConnection():
 
     def __init__(self):
