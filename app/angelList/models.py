@@ -120,10 +120,10 @@ class AngelListModel():
 
         allJobs = self.getJobs(1)
 
-        print str(allJobs)
+        #print str(allJobs)
         
         try:
-            print "inside try "
+            app.logger.info('Trying to save JOb in the db')
             a = x.execute("""
             INSERT INTO jobs
             VALUES (%s,%s)""",(str(1),json.dumps(allJobs)))
@@ -131,6 +131,23 @@ class AngelListModel():
         except:
             app.logger.info('Exception Occured !')
             conn.rollback()
+
+        allJobs = self.getJobs(2)
+
+        #print str(allJobs)
+        
+        try:
+            app.logger.info('Trying to save JOb in the db')
+            a = x.execute("""
+            INSERT INTO jobs
+            VALUES (%s,%s)""",(str(2),json.dumps(allJobs)))
+            conn.commit()
+        except:
+            app.logger.info('Exception Occured !')
+            conn.rollback()
+
+        
+        conn.close()
 
         app.logger.info("Completed fetching all the jobs")
 

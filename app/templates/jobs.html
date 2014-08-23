@@ -16,12 +16,14 @@
         jobDetailsDict = {};
         jobTypeDict = {};
         jobRoleDict = {
-            'marketing':[],
-            'product':[],
-            'developer,software,engineer':[],
-            'sales':[],
-            'fincance,accounting':[],
-            };
+            'marketing': [],
+            'product': [],
+            'developer,software,engineer': [],
+            'mobile,developer': [],
+            'sales': [],
+            'finance,accounting': [],
+            'others': [],
+        };
     </script>
 </head>
 
@@ -96,7 +98,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-2"></div>
+                <div class="col-md-1"></div>
                 <div class="col-md-2">
                     <div class="filterHoverDiv" id="locationsFilter" style="display:none; position:absolute; z-index:10">
                         <div class="form-group">
@@ -132,19 +134,21 @@
                 </div>
                 <div class="col-md-2">
                     <div class="filterHoverDiv" id="roleTypeFilter" style="display:none; position:absolute; z-index:10">
-                        <div><a href="#" class="roleTypeAnchor" roleType="Software,Engineer,developer">Software Engineer</a>
+                        <div><a href="#" class="roleTypeAnchor" roleType="developer,software,engineer">Software Engineer</a>
                         </div>
-                        <div><a href="#" class="roleTypeAnchor" roleType="Mobile,developer">Mobile Developer</a>
+                        <div><a href="#" class="roleTypeAnchor" roleType="mobile,developer">Mobile Developer</a>
                         </div>
-                        <div><a href="#" class="roleTypeAnchor" roleType="Marketing,">Marketing</a>
+                        <div><a href="#" class="roleTypeAnchor" roleType="marketing">Marketing</a>
                         </div>
-                        <div><a href="#" class="roleTypeAnchor" roleType="Product,Manager">Product Manager</a>
+                        <div><a href="#" class="roleTypeAnchor" roleType="product">Product Manager</a>
                         </div>
-                        <div><a href="#" class="roleTypeAnchor" roleType="Sales,">Sales</a>
+                        <div><a href="#" class="roleTypeAnchor" roleType="sales">Sales</a>
                         </div>
-                        <div><a href="#" class="roleTypeAnchor" roleType="Finance,accounting">Finance/Accounting</a>
+                        <div><a href="#" class="roleTypeAnchor" roleType="finance,accounting">Finance/Accounting</a>
                         </div>
-                        <div><a href="#" class="roleTypeAnchor" roleType="Operations,">Operations</a>
+                        <div><a href="#" class="roleTypeAnchor" roleType="operations">Operations</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="others">Others</a>
                         </div>
                     </div>
                 </div>
@@ -188,16 +192,7 @@
                 </div>
                 <div class="col-md-10">
                     <div id="allJobsDetail">
-                        <!--
-			            <div class="singleJob-row card">
-			                <div class="job-title col-md-2">Vijay</div>
-			                <div class="jobDate col-md-2"> vijay</div>
-			                <div class="jobUrl col-md-3"> Vijay</div>
-			                <div class="jobLocation col-md-5"> malhotra</div>
-			                
-			                <div class="else">vijay</div>
-			            </div>
--->
+
                     </div>
                 </div>
 
@@ -217,49 +212,51 @@
                 payloadJson = JSON.parse($(className).html());
 
                 $.extend(obj, {
-                    'payload': $(className).html()
+                    'payload': $(className).html(),
+                    'visited': false
                 });
 
-                return;
             });
 
-            
-            
-            
+
+
+
             $(".filterName").click(function () {
                 //$(".filterHoverDiv").hide();
                 $('#' + $(this).attr("showDiv")).toggle();
             });
 
-//            $(".filterName").hover(function () {
-//                    $(".filterHoverDiv").fadeOut();
-//                    $('#' + $(this).attr("showDiv")).fadeIn();
-//                },
-//                function () {
-//                    //$(".filterHoverDiv").fadeOut();
-//                });
-//
-//            $(".filterHoverDiv").hover(function () {},
-//                function () {
-//                    $(".filterHoverDiv").fadeOut();
-//                });
+            //            $(".filterName").hover(function () {
+            //                    $(".filterHoverDiv").fadeOut();
+            //                    $('#' + $(this).attr("showDiv")).fadeIn();
+            //                },
+            //                function () {
+            //                    //$(".filterHoverDiv").fadeOut();
+            //                });
+            //
+            //            $(".filterHoverDiv").hover(function () {},
+            //                function () {
+            //                    $(".filterHoverDiv").fadeOut();
+            //                });
 
 
             //Trigger logic for the Job type
 
-            $(".jobTypeAnchor").click(function () {
+            $(".jobTypeAnchor").click(function (e) {
                 console.log($(this).attr('jobType'));
                 buildCurrentFilters($(this).attr('jobType'), 'jobTypeTag');
                 refreshJobs();
+                e.preventDefault();
             });
 
-            
+
             //Trigger logic for the job role
-            
-            $(".roleTypeAnchor").click(function () {
+
+            $(".roleTypeAnchor").click(function (e) {
                 console.log($(this).attr('roleType'));
                 buildCurrentFilters($(this).attr('roleType'), 'roleTypeTag');
-                //refreshJobs();
+                refreshJobs();
+                e.preventDefault();
             });
 
 
@@ -278,6 +275,7 @@
                     refreshJobs();
 
                 }
+                e.preventDefault();
 
             });
 
@@ -296,9 +294,14 @@
             //empty the current html
             $('#allJobsDetail').html("");
 
+            jobVisited = jobsArr[pageid - 1].visited;
             payloadJson = JSON.parse(jobsArr[pageid - 1].payload);
 
             payloadJson.jobs.forEach(function (jobObj, index) {
+
+
+
+
                 var locationTag = '';
                 tags = jobObj.tags;
                 tags.forEach(function (tag, index) {
@@ -309,29 +312,41 @@
                         var dict = {};
                         dict[tag.name] = jobObj.id
                         locationDict.push(dict);
+                        
+                        $.extend(jobObj,{'location' : tag.name});
+                        
                         jobDetailsDict[jobObj.id] = jobObj;
+                        
                     }
                 });
 
+                if (!jobVisited) {
 
+                    //Constructing the jobsType LookUp.
+                    if (!jobTypeDict[jobObj.job_type] || jobTypeDict[jobObj.job_type] == 'undefined') {
+                        jobTypeDict[jobObj.job_type] = [];
+                    } else {
+                        jobTypeDict[jobObj.job_type].push(jobObj.id);
+                    }
 
-                //Constructing the jobsType LookUp.
-                if (!jobTypeDict[jobObj.job_type] || jobTypeDict[jobObj.job_type] == 'undefined') {
-                    jobTypeDict[jobObj.job_type] = [];
-                } else {
-                    jobTypeDict[jobObj.job_type].push(jobObj.id);
+                    //Constructing the role lookup
+                    if (jobObj.title.toLowerCase().indexOf('market') > 0) {
+                        jobRoleDict['marketing'].push(jobObj.id);
+                    } else if (jobObj.title.toLowerCase().indexOf('product') > 0) {
+                        jobRoleDict['product'].push(jobObj.id);
+                    } else if (jobObj.title.toLowerCase().indexOf('software') > 0 ||
+                        jobObj.title.toLowerCase().indexOf('develop') > 0) {
+                        jobRoleDict['developer,software,engineer'].push(jobObj.id);
+                    } else if (jobObj.title.toLowerCase().indexOf('sale') > 0) {
+                        jobRoleDict['sales'].push(jobObj.id);
+                    } else if (jobObj.title.toLowerCase().indexOf('finance') > 0 ||
+                        jobObj.title.toLowerCase().indexOf('account') > 0) {
+                        jobRoleDict['finance,accounting'].push(jobObj.id);
+                    } else {
+                        jobRoleDict['others'].push(jobObj.id);
+                    }
                 }
-                
-                //Constructing the role lookup
-                
-                if(jobObj.title.toLowerCase().indexOf('market')){
-                    jobRoleDict['marketing'].push(jobObj.id);
-                }else if(jobObj.title.toLowerCase().indexOf('product')){
-                    jobRoleDict['product'].push(jobObj.id);
-                }else if(jobObj.title.toLowerCase().indexOf('software') || jobObj.title.toLowerCase().indexOf('develop') ){
-                    jobRoleDict['software'].push(jobObj.id);
-                }
-                
+
 
                 //console.log(index);
 
@@ -339,10 +354,13 @@
 
 
             });
+            
+            //visited for the one web app instance !
+            jobsArr[pageid - 1].visited = true;
         };
-        
-        
-        
+
+
+
 
         var displayAllJobsByLocation = function (location) {
             payloadJson = JSON.parse(jobsArr[0].payload);
@@ -360,21 +378,30 @@
             });
 
         };
-        
-        
+
+
         var displayAllJobsByJobType = function (jobType) {
-            if(jobTypeDict[jobType] && jobTypeDict[jobType] !== 'undefined'){
-                jobTypeDict[jobType].forEach(function(jobId,index){
+            if (jobTypeDict[jobType] && jobTypeDict[jobType] !== 'undefined') {
+                jobTypeDict[jobType].forEach(function (jobId, index) {
                     displayAllJobsByJobId(jobId);
                 });
             }
         };
         
+        var displayAllJobsByRoleType = function (roleType) {
+            console.log(roleType);
+            if (jobRoleDict[roleType] && jobRoleDict[roleType] !== 'undefined'){
+                jobRoleDict[roleType].forEach(function (jobId, index) {
+                    displayAllJobsByJobId(jobId);
+                });
+            }
+        };
+
 
         var displayAllJobsByJobId = function (jobId, location) {
 
             console.log(jobDetailsDict[jobId]);
-            buildTemplate(jobDetailsDict[jobId], location);
+            buildTemplate(jobDetailsDict[jobId], jobDetailsDict[jobId].location);
         };
 
 
@@ -400,31 +427,31 @@
             $(".currentFilters").append(template);
 
 
-
-
         };
 
         var refreshJobs = function () {
             //empty the current html
             $('#allJobsDetail').html("");
-            
-            if($(".singleFilter").length == 0){
+
+            if ($(".singleFilter").length == 0) {
                 displayAllJobsByPage(1);
             }
-            
+
             $(".singleFilter").each(function (index, el) {
-                
-                
-                if(el.children[0].getAttribute('filterTag') == 'locationTag'){
-                    displayAllJobsByLocation(el.children[0].innerHTML);    
+
+
+                if (el.children[0].getAttribute('filterTag') == 'locationTag') {
+                    displayAllJobsByLocation(el.children[0].innerHTML);
+                }
+
+                if (el.children[0].getAttribute('filterTag') == 'jobTypeTag') {
+                    displayAllJobsByJobType(el.children[0].innerHTML);
                 }
                 
-                console.log(el.children[0]);
-                
-                if(el.children[0].getAttribute('filterTag') == 'jobTypeTag'){
-                    displayAllJobsByJobType(el.children[0].innerHTML);    
+                if (el.children[0].getAttribute('filterTag') == 'roleTypeTag') {
+                    displayAllJobsByRoleType(el.children[0].innerHTML);
                 }
-                
+
             });
 
         };
@@ -435,7 +462,7 @@
 
             refreshJobs();
 
-            
+
         };
     </script>
 
