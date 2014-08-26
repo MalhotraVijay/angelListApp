@@ -23,7 +23,7 @@ class DevelopmentConfig(Config):
     """
     Started using psycopg2 for postgres db
     """
-    """
+    
     DB_HOST	= 'ec2-54-225-182-133.compute-1.amazonaws.com'
     DB_PORT	= '5432'
     DB_USER	= 'jbwomvcwpdjdnt'
@@ -36,6 +36,6 @@ class DevelopmentConfig(Config):
     DB_USER	= 'vijay'
     DB_PASSWORD	= 'vijay02'
     DB_NAME = 'deep'
-    
+    """
     
     #SQLALCHEMY_DATABASE_URI = "postgresql://vijay:vijay02@localhost/deep"    
