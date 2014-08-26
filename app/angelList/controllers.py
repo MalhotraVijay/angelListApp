@@ -1,4 +1,4 @@
-from app import s_app
+from app import s_app,logger
 import json
 from models import AngelListModel, DbConnection
 from flask import render_template,redirect,session
@@ -56,8 +56,6 @@ def AuthenticationHandler():
         db = DbConnection()
 
         conn = db.conn
-
-        print conn
         
         x = conn.cursor()
 
@@ -70,7 +68,6 @@ def AuthenticationHandler():
         rows = x.fetchall()
 
         session['userToken'] = access_token
-        print rows
 
 
         if rows != []:
@@ -129,11 +126,13 @@ def jobsHandler():
 @angelListregister.route('/viewJobs',methods=['GET'])
 def viewJobsHandler():
 
+    logger.info("View Jobs handler invoked !")
+    
     ag = AngelListModel()
-    allJobs = ag.getAllJobs()
+    allJobs = ag.getAllFilteredJobs()
 
     return render_template(
-        'jobs.html',
+        'jobSearch.html',
         allJobs = allJobs,
         )
 
@@ -148,3 +147,14 @@ def fetchJobsHandler():
     ag = AngelListModel()
     ag.storeAllJobsInDB()
     return "success"
+
+
+
+@angelListregister.route('/filterJobs',methods=['GET'])
+def filterJobsHandler():
+    ag = AngelListModel()
+    ag.filterCurrentJobs()
+
+    return "success"
+
+

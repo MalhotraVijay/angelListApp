@@ -1,10 +1,13 @@
 body{
    font-family: Open-Sans; 
+    
 }
 
 .navbar-inverse{
+/*
     background-color: #d3505a;
     border-color: #d3505a;
+*/
     border-radius: 0;
     
 }
@@ -13,6 +16,7 @@ body{
     padding: 12px;
     font-size: 20px;
     font-weight: 700;
+    color: #fff;
 }
 .btn-angel{
     background-color: #000;

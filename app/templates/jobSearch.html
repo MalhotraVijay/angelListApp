@@ -1,0 +1,645 @@
+<html>
+
+<head>
+    <title>Jobs Page</title>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/underscore-min.js') }}"></script>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.css" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/mainapp.css') }}" rel="stylesheet" />
+<!--    <script src="{{ url_for('static', filename='js/underscore-min.js') }}"  />-->
+    <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+
+    <script type="text/javascript">
+        jobsArr = []; window.jo = [];
+        userInfo = 'undefined';
+        locationArr = [];
+        companyArr = ['full-time','contract','internship','cofounder','marketing','sales','finance/accounting','others'];
+        commonDict = {
+            'type' : ['full-time','contract','internship','cofounder'],
+            'roles' : ['marketing','sales','finance/marketing','others']
+        };
+        jobsToDisplay = [];
+        locationDict = [];
+        jobDetailsDict = {};
+        jobLocationDict = {};
+        jobCompanyDict = {};
+        jobTypeDict = {};
+        jobRoleDict = {
+            'marketing': [],
+            'product': [],
+            'developer,software,engineer': [],
+            'mobile,developer': [],
+            'sales': [],
+            'finance,accounting': [],
+            'others': [],
+        };
+    </script>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+
+
+        <div class="row">
+            <nav class="navbar navbar-inverse" role="navigation">
+                <div><span class="nav-data">AngelList Demo App</span>
+                </div>
+            </nav>
+        </div>
+        <div id="searchResults" class="row"></div>
+        <div id="companysearchResults" class="row"></div>
+
+        <div class="container">
+
+            <div class="row" style="">
+                <div class="col-md-4">
+                    {% if currentUser %}
+                    <div id="currentUser" class="">
+
+                        <div id="userName" style="display:none;">{{currentUser.1}}</div>
+                        <div id="userJson" style="display:none;">{{currentUser.3}}</div>
+                        <div id="userInfo" style="padding-left:20px;">
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        var userInfo = {};
+                        userInfo['name'] = '{{currentUser.1}}';
+                        userInfo['userJson'] = $('#userJson').html();
+                    </script>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <div class="">
+                        <h5> Search for jobs on relevant filters ! </h5>
+
+                    </div>
+                </div>
+                <div class="col-md-4"></div>
+
+            </div>
+
+            <div class="row">
+                <hr>
+            </div>
+            <div class="row">
+                {% for job in allJobs%}
+                <div class="jobsPageid" style="display:none;">
+                    {{ job.0 }}
+                </div>
+                <div class="jobsPayload_{{ job.0 }}" style="display:none">
+                    {{ job.1 }}
+                </div>
+
+                <script type="text/javascript">
+                    jobsArr.push({
+                        'pageid': '{{job.0}}'
+                    });
+                </script>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-2"></div>
+                <div class="col-md-10">
+                    <div class="jobSubFilters">
+                        <div class="currentFilters">
+                            <!--                            <span class="singleFilter">Name <span class="removeFilter">&nbsp;X</span> </span>-->
+                        </div>
+                        <div class="" style="margin-top:20px;">
+                            <span class="col-md-6" showDiv="">
+                                <div class="form-group">
+                                    <input type="text" class="form-control ui-autocomplete-input" searchFor="" searchParam="" name="companycontentSearch" id="companycontentSearch" placeholder="Search Keyword (Company, Job type, Role)">
+                                </div>
+                            </span>
+                            <span class="col-md-6" showDiv="">
+                                <div class="form-group">
+                                    <input type="text" class="form-control ui-autocomplete-input" searchFor="" searchParam="" name="contentSearch" id="contentSearch" placeholder="Search for location">
+                                </div>
+                            </span>
+
+                        </div>
+                        <div>
+                            <div class="col-md-4"></div>
+                            <div class="col-md-6">*Press Enter twice to select the search filter ! </div>
+                            <div class="col-md-2"></div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+                <br>
+                <br>
+            </div>
+<!--
+            <div class="row">
+                <div class="col-md-6"></div>
+                <div class="col-md-4"><button type="button" class="btn">Search For Jobs</button></div>
+                <div class="col-md-2"></div>
+            </div>
+-->
+
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-2">
+                    <div class="filterHoverDiv" id="locationsFilter" style="display:none; position:absolute; z-index:10">
+                        <div class="form-group">
+                            <input type="text" class="form-control ui-autocomplete-input" searchFor="" searchParam="" name="contentSearch" id="contentSearch" placeholder="Search">
+                        </div>
+
+                        <div class="suggestedLocation">
+                            search and press enter
+                            <ul type="none" id="topLinks">
+                                <li>
+                                    <a href=""></a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-2">
+                    <div class="filterHoverDiv" id="jobsTypeFilter" style="display:none; position:absolute; z-index:10">
+                        <div><a href="#" class="jobTypeAnchor" jobType="full-time">Fulltime</a>
+                        </div>
+                        <div><a href="#" class="jobTypeAnchor" jobType="contract">Contract</a>
+                        </div>
+                        <div><a href="#" class="jobTypeAnchor" jobType="internship">Internship</a>
+                        </div>
+                        <div><a href="#" class="jobTypeAnchor" jobType="cofounder">Co-Founder</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="filterHoverDiv" id="roleTypeFilter" style="display:none; position:absolute; z-index:10">
+                        <div><a href="#" class="roleTypeAnchor" roleType="developer,software,engineer">Software Engineer</a>
+                        </div>
+
+                        <div><a href="#" class="roleTypeAnchor" roleType="marketing">Marketing</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="product">Product Manager</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="sales">Sales</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="finance,accounting">Finance/Accounting</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="operations">Operations</a>
+                        </div>
+                        <div><a href="#" class="roleTypeAnchor" roleType="others">Others</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="filterHoverDiv" id="companyFilter" style="display:none; position:absolute; z-index:10">
+                        <div class="form-group">
+                            <input type="text" class="form-control ui-autocomplete-input" searchFor="" searchParam="" name="companycontentSearch" id="companycontentSearch" placeholder="Search">
+                        </div>
+
+                        <div class="companySuggested">
+                            Search Company and press enter
+                            <ul type="none" id="topLinks">
+                                <li>
+                                    <a href=""></a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <br>
+            </div>
+            <div class="row">
+                <ul class="pagination pull-right">
+                    <li><a href="#">&laquo;</a>
+                    </li>
+                    <li><a href="#" onclick=" displayAllJobsByPage(1);">1</a>
+                    </li>
+                    <li><a href="#" onclick=" displayAllJobsByPage(2);">2</a>
+                    </li>
+                    <li><a href="#" onclick=" displayAllJobsByPage(3);">3</a>
+                    </li>
+                    <li><a href="#" onclick=" displayAllJobsByPage(4);">4</a>
+                    </li>
+                    <li><a href="#" onclick=" displayAllJobsByPage(5);">5</a>
+                    </li>
+                    <li><a href="#">&raquo;</a>
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="mainFilter">
+                        <div id="vertical-tabs-view" class="site-navigation">
+                            <ul class="nav nav-pills nav-stacked">
+                                <li class="active"><a href="#" onclick="displayAllJobsByPage(1);">All Jobs</a>
+                                </li>
+<!--
+                                <li class=""><a href="#">Interested In you </a>
+                                </li>
+-->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div id="allJobsDetail">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            jobsArr.forEach(function (obj, index) {
+
+                className = '.jobsPayload_' + (index + 1)
+
+                payloadJson = JSON.parse($(className).html());
+
+                $.extend(obj, {
+                    'payload': $(className).html(),
+                    'visited': false
+                });
+
+            });
+
+
+            //Fill the userInfo
+            if (userInfo && userInfo != 'undefined') {
+                var userInfoObj = JSON.parse(userInfo.userJson);
+                var userTemplate = '<div><img width="100" class="img-circle" height="100" src="' +
+                    userInfoObj.image + '"/></div><div><span>' +
+                    userInfoObj.name + ', ' + userInfoObj.locations[0].name + '</span></div><div><p style="width:250px;">' +
+                    userInfoObj.bio + '</p></div></div>';
+
+                $("#userInfo").append(userTemplate);
+            }
+
+
+            $(".filterName").click(function () {
+                //$(".filterHoverDiv").hide();
+                $('#' + $(this).attr("showDiv")).toggle();
+            });
+
+
+            //Trigger logic for the Job type
+
+            $(".jobTypeAnchor").click(function (e) {
+                console.log($(this).attr('jobType'));
+                buildCurrentFilters($(this).attr('jobType'), 'jobTypeTag');
+                refreshJobs();
+                e.preventDefault();
+            });
+
+
+            //Trigger logic for the job role
+
+            $(".roleTypeAnchor").click(function (e) {
+                console.log($(this).attr('roleType'));
+                buildCurrentFilters($(this).attr('roleType'), 'roleTypeTag');
+                refreshJobs();
+                e.preventDefault();
+            });
+
+
+
+            //Trigger logic For the location based searching
+
+            $("#contentSearch").autocomplete({
+                source: locationArr,
+                appendTo: "#searchResults"
+            });
+
+            $("#companycontentSearch").autocomplete({
+                source: companyArr,
+                appendTo: "#companysearchResults"
+            });
+
+
+            $("#contentSearch").keypress(function (e) {
+                if (e.which == 13) {
+                    buildCurrentFilters($(this).val(), 'locationTag');
+                    refreshJobs();
+                }
+            });
+
+            $("#companycontentSearch").keypress(function (e) {
+                if (e.which == 13) {
+                    
+                    //append location always to the last
+                    
+                    try{
+                        var length = $(".singleFilter").length;
+                        var lastSpan = $(".singleFilter")[length-1];
+                        if(lastSpan.children[0].getAttribute('filterTag')=='locationTag'){
+                             var lastSpanCopy = lastSpan;
+                            lastSpan.parentNode.removeChild(lastSpan);
+                        }
+                    }catch(e){
+                        
+                    }
+                   
+                    var selectedVal = $(this).val();
+                   
+                    if(commonDict.roles.indexOf(selectedVal) >= 0){
+                        console.log("Role called");
+                        buildCurrentFilters(selectedVal, 'roleTypeTag');
+                    }else if(commonDict.type.indexOf(selectedVal) >= 0){
+                        console.log('type called ');
+                        buildCurrentFilters(selectedVal, 'jobTypeTag');
+                    }
+                    else{
+                        buildCurrentFilters($(this).val(), 'companyTag');
+                    }
+                    
+                    if(lastSpanCopy && lastSpanCopy !='undefined'){
+                        $('.currentFilters').append(lastSpanCopy);
+                    }
+                   
+                    refreshJobs();
+                }
+            });
+
+
+            //app logic starts here
+
+            displayAllJobsByPage(1);
+            displayAllJobsByPage(2);
+            displayAllJobsByPage(3);
+            displayAllJobsByPage(4);
+            displayAllJobsByPage(1);
+        });
+
+
+
+        var displayAllJobsByPage = function (pageid) {
+
+            //empty the current html
+            $('#allJobsDetail').html("");
+
+            jobVisited = jobsArr[pageid - 1].visited;
+            payloadJson = JSON.parse(jobsArr[pageid - 1].payload);
+
+            payloadJson.jobs.forEach(function (jobObj, index) {
+
+                var locationTag = '';
+                tags = jobObj.tags;
+                var dict = {};
+
+                tags.forEach(function (tag, index) {
+                    if (tag.tag_type == "LocationTag") {
+                        locationTag = tag.name;
+
+
+                        dict[tag.name] = jobObj.id;
+                        dict[jobObj.id] = tag.name;
+
+                        locationDict.push(dict);
+
+                        $.extend(jobObj, {
+                            'location': tag.name
+                        });
+
+                        jobDetailsDict[jobObj.id] = jobObj;
+
+                    }
+                });
+
+                if (!jobVisited) {
+
+
+                    //Constructing the jobsLocation LookUp.
+                    locationTagName = dict[jobObj.id];
+                    if (!jobLocationDict[locationTagName] || jobLocationDict[locationTagName] == 'undefined') {
+                        jobLocationDict[locationTagName] = [];
+                        jobLocationDict[locationTagName].push(jobObj.id);
+                        if (locationTagName && locationTagName != 'undefined')
+                            locationArr.push(locationTagName);
+                    } else {
+                        jobLocationDict[locationTagName].push(jobObj.id);
+                    }
+
+
+                    //Constructing the jobsCompany LookUp.
+                    if (!jobCompanyDict[jobObj.startup.name] || jobCompanyDict[jobObj.startup.name] == 'undefined') {
+                        jobCompanyDict[jobObj.startup.name] = [];
+                        jobCompanyDict[jobObj.startup.name].push(jobObj.id);
+                        if (jobObj.startup.name && jobObj.startup.name != 'undefined')
+                            companyArr.push(jobObj.startup.name);
+                    } else {
+                        jobCompanyDict[jobObj.startup.name].push(jobObj.id);
+                    }
+
+
+                    //Constructing the jobsType LookUp.
+                    if (!jobTypeDict[jobObj.job_type] || jobTypeDict[jobObj.job_type] == 'undefined') {
+                        jobTypeDict[jobObj.job_type] = [];
+                        jobTypeDict[jobObj.job_type].push(jobObj.id);
+                    } else {
+                        jobTypeDict[jobObj.job_type].push(jobObj.id);
+                    }
+                    
+                    
+                    
+                    window.jo.push(jobObj.title.toLowerCase());
+
+                    //Constructing the role lookup
+                    if (jobObj.title.toLowerCase().indexOf('market') >= 0 || 
+                        jobObj.title.toLowerCase().indexOf('operation') >= 0 || 
+                        jobObj.title.toLowerCase().indexOf('business') >= 0 ||
+                        jobObj.title.toLowerCase().indexOf('growth') >= 0 ||
+                        jobObj.title.toLowerCase().indexOf('finance') >= 0 ||
+                        jobObj.title.toLowerCase().indexOf('account') >= 0 ||
+                        jobObj.title.toLowerCase().indexOf('manage') >= 0) {
+                        console.log(jobObj.title.toLowerCase());
+                        jobRoleDict['marketing'].push(jobObj.id);
+                    } else if (jobObj.title.toLowerCase().indexOf('product') >= 0) {
+                        jobRoleDict['product'].push(jobObj.id);
+                    } else if (jobObj.title.toLowerCase().indexOf('software') >= 0 ||
+                        jobObj.title.toLowerCase().indexOf('develop') >= 0) {
+                        jobRoleDict['developer,software,engineer'].push(jobObj.id);
+                    } else if (jobObj.title.toLowerCase().indexOf('sale') >= 0) {
+                        jobRoleDict['sales'].push(jobObj.id);
+                    } else if (jobObj.title.toLowerCase().indexOf('finance') >= 0 ||
+                        jobObj.title.toLowerCase().indexOf('account') >= 0) {
+                        jobRoleDict['finance,accounting'].push(jobObj.id);
+                    } else {
+                        jobRoleDict['others'].push(jobObj.id);
+                    }
+                }
+
+
+
+                //console.log(index);
+
+                buildTemplate(jobObj, locationTag)
+
+
+            });
+
+            //visited for the one web app instance !
+            jobsArr[pageid - 1].visited = true;
+        };
+
+
+
+
+        var displayAllJobsByLocation = function (location) {
+
+            if (jobLocationDict[location] && jobLocationDict[location] !== 'undefined') {
+                if(jobsToDisplay.length == 0){
+                jobsToDisplay = _.intersection(jobsToDisplay, jobLocationDict[location] );
+                }else{
+                    jobsToDisplay = jobLocationDict[location];
+                }
+//                jobLocationDict[location].forEach(function (jobId, index) {
+//                    displayAllJobsByJobId(jobId);
+//                });
+            }
+
+        };
+
+
+        var displayAllJobsByJobType = function (jobType) {
+            if (jobTypeDict[jobType] && jobTypeDict[jobType] !== 'undefined') {
+                jobsToDisplay = _.union(jobsToDisplay, jobTypeDict[jobType] );
+//                jobTypeDict[jobType].forEach(function (jobId, index) {
+//                    displayAllJobsByJobId(jobId);
+//                });
+            }
+        };
+
+        var displayAllJobsByRoleType = function (roleType) {
+            console.log("Display Job By Role called");
+            if (jobRoleDict[roleType] && jobRoleDict[roleType] !== 'undefined') {
+                jobsToDisplay = _.union(jobsToDisplay, jobRoleDict[roleType]);
+//                jobRoleDict[roleType].forEach(function (jobId, index) {
+//                    displayAllJobsByJobId(jobId);
+//                });
+            }
+        };
+
+        var displayAllJobsByCompany = function (company) {
+            console.log(company);
+            if (jobCompanyDict[company] && jobCompanyDict[company] !== 'undefined') {
+                if(jobsToDisplay.length == 0){
+                    jobsToDisplay = jobCompanyDict[company];
+                }else{
+                    jobsToDisplay = _.intersection(jobsToDisplay, jobCompanyDict[company] );
+                }
+                
+//                jobCompanyDict[company].forEach(function (jobId, index) {
+//                    displayAllJobsByJobId(jobId);
+//                });
+            }
+        };
+
+
+        var displayAllJobsByJobId = function (jobId) {
+
+            console.log(jobDetailsDict[jobId]);
+            buildTemplate(jobDetailsDict[jobId], jobDetailsDict[jobId].location);
+        };
+
+
+
+        var buildTemplate = function (jobObj, locationTag) {
+
+            var template = '<div class="singleJob-row card">' +
+                '<div class="companyImage col-md-1"><img src="' + jobObj.startup.thumb_url + '" width="37" height="37" ></img></div>' +
+                '<div class="jobTitle col-md-3">' + jobObj.title + '</div>' +
+                '<div class="jobStartupName col-md-2">' + jobObj.startup.name + '</div>' +
+                '<div class="jobDate col-md-2"> ' + jobObj.job_type + '</div>' +
+                '<div class="jobUrl col-md-2"> <a href="' + jobObj.angellist_url + '"> Visit Job ! </a></div>' +
+                '<div class="jobLocation col-md-2"> <b> <u> ' + locationTag + '</u> </b></div>' +
+                '<div class="else">' + '.' + '</div>' +
+                '</div>'
+            $('#allJobsDetail').prepend(template);
+        };
+
+
+        var buildCurrentFilters = function (filterName, filterTag) {
+
+            var template = '<span class="singleFilter"> <span class="filternm" filterTag="' + filterTag + '" >' + filterName + '</span><span ><a href="javascript:void(0);" onclick="removeFilter(this)" class="removeFilter">&nbsp;X</a></span> </span>';
+            $(".currentFilters").append(template);
+
+
+        };
+
+        var refreshJobs = function () {
+            //empty the current html
+            $('#allJobsDetail').html("");
+
+            if ($(".singleFilter").length == 0) {
+                displayAllJobsByPage(1);
+            }
+
+            $(".singleFilter").each(function (index, el) {
+                
+                console.log(el.children[0].getAttribute('filterTag'));
+                
+
+                if (el.children[0].getAttribute('filterTag') == 'jobTypeTag') {
+                    displayAllJobsByJobType(el.children[0].innerHTML);
+                }
+
+                if (el.children[0].getAttribute('filterTag') == 'roleTypeTag') {
+                    displayAllJobsByRoleType(el.children[0].innerHTML);
+                }
+
+                if (el.children[0].getAttribute('filterTag') == 'companyTag') {
+                    displayAllJobsByCompany(el.children[0].innerHTML);
+                }
+                
+                if (el.children[0].getAttribute('filterTag') == 'locationTag') {
+                    displayAllJobsByLocation(el.children[0].innerHTML);
+                }
+
+            });
+            
+            console.log(jobsToDisplay);
+            if(jobsToDisplay.length == 0){
+                $('#allJobsDetail').append("<h3>*Your search doesn't match any records try something else please. !</h3> ")
+            }
+            
+            jobsToDisplay.forEach(function (jobId, index) {
+                    displayAllJobsByJobId(jobId);
+            });
+
+        };
+
+
+        var removeFilter = function (ev) {
+            ev.parentElement.parentElement.parentElement.removeChild(ev.parentElement.parentElement);
+
+            refreshJobs();
+
+        };
+    </script>
+
+</body>
+
+</html>
+
+
+
+
+

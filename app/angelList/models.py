@@ -66,7 +66,6 @@ class AngelListModel():
             response = urllib2.urlopen(urllib2.Request(url, params, headers))
             json_data = json.loads(response.read())
 
-            print json_data
             access_token = json_data['access_token']
         except:
             # access token failed to fetch (for any reason); so we'll just return blank
@@ -119,7 +118,7 @@ class AngelListModel():
         x = conn.cursor()
 
 
-        for i in range(1,6):
+        for i in range(1,12):
 
             allJobs = self.getJobs(i)
 
@@ -139,6 +138,26 @@ class AngelListModel():
 
         app.logger.info("Completed fetching all the jobs")
 
+
+    def insertJob(self,jobsDict):
+
+        db = DbConnection()
+        conn = db.conn
+
+        app.logger.info("insert Jobs Invoked %s" % json.dumps(jobsDict))
+        x = conn.cursor()
+        try:
+            x.execute("""
+                INSERT INTO filterJobs
+                VALUES (%s,%s)""",(
+                    jobsDict['page'],
+                    json.dumps(jobsDict)
+                    ))
+            conn.commit()
+        except:
+            app.logger.info('Error in accessing the Job DB connection')
+
+        conn.close()
 
 
     def getUser(self,access_token):
@@ -180,7 +199,54 @@ class AngelListModel():
         conn.close()
         return allJobs
 
+    def getAllFilteredJobs(self):
 
+        db = DbConnection()
+        conn = db.conn
+
+        app.logger.info("Get Filtered job called")
+        x = conn.cursor()
+        try:
+            cursor = x.execute("""
+            select * from filterJobs
+            """)
+            conn.commit()
+        except:
+            app.logger.info('Error in accessing the Job DB connection')
+    
+        allJobs =  x.fetchall()
+
+        conn.close()
+        return allJobs
+
+
+    def filterCurrentJobs(self):
+        allJobs = self.getAllJobs()
+        
+        app.logger.info("FilterJobsInvoked")
+        allJobsList = []
+        
+        for jobPage in allJobs:
+            jobsList = []
+            jobsDict = { 'page' :jobPage[0]  }
+            jobs =  json.loads(jobPage[1])['jobs']
+            for oneJob in jobs:
+                if ('market' in oneJob['title'].lower() or
+                    ('manage' in oneJob['title'].lower()) or
+                    ('growth' in oneJob['title'].lower()) or
+                    ('business' in oneJob['title'].lower()) or
+                    ('operation' in oneJob['title'].lower()) or
+                    ('account' in oneJob['title'].lower()) or
+                    ('finance' in oneJob['title'].lower()) or
+                    ('sale' in oneJob['title'].lower())):
+                    jobsList.append(oneJob)
+                    
+            jobsDict['jobs'] = jobsList
+            self.insertJob(jobsDict)
+            allJobsList.append(jobsDict)
+
+        return
+        
         
 
 
